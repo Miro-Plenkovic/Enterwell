@@ -33,7 +33,6 @@ export default function Filter(props: FilterProps) {
             howToPrep: { value: number };
             mealType: { value: number };
           };
-          console.log(target);
           const filterValue = target.filterValue.value;
           const difficulty = target.difficulty.value;
           const howToPrep = target.howToPrep.value;

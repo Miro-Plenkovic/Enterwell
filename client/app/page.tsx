@@ -51,7 +51,6 @@ export default function Home() {
     getRecipeDetails(r.id)
       .then((d) => {
         setActiveRecipe(d);
-        console.log(d);
       })
       .catch((e: unknown) => {
         toast.error(e instanceof Error ? e.message : String(e));

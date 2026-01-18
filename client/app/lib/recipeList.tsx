@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { RecipeResponse } from "../apiCalls";
 import { Difficulty, MealType, HowToPrep } from "./recipeForm";
+import { useEffect, useState } from "react";
 
 export type RecipeListProps = {
   recipe: RecipeResponse;
@@ -12,7 +13,7 @@ export default function RecipeList(props: RecipeListProps) {
     <div>
       <Image
         className="dark:invert"
-        src={props.recipe?.image ?? ""}
+        src={`/api/images?image=${props.recipe.image}`}
         alt="recipe image"
         width={100}
         height={20}
@@ -20,19 +21,10 @@ export default function RecipeList(props: RecipeListProps) {
         onClick={() => props.openThisRecipe(props.recipe)}
       />
       <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-        {props.recipe?.name ?? ""}
+        Naziv: {props.recipe?.name ?? ""}
       </div>
       <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-        {props.recipe?.description ?? ""}
-      </div>
-      <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-        {Difficulty[props.recipe?.difficulty ?? 0]}
-      </div>
-      <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-        {HowToPrep[props.recipe?.how_to_prep ?? 0]}
-      </div>
-      <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-        {MealType[props.recipe?.meal_type ?? 0]}
+        Opis: {props.recipe?.description ?? ""}
       </div>
     </div>
   );

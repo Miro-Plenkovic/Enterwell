@@ -2,7 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['cdn.jsdelivr.net'],  
+    domains: ['cdn.jsdelivr.net'],
+    localPatterns: [
+      {
+        pathname: '/api/**',
+      },
+    ],
   },
   async rewrites() {
     return [

@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { createClient } from '@supabase/supabase-js'
+import { Readable } from "node:stream";
 
 require('dotenv').config()
 const app = express();
@@ -44,8 +45,6 @@ export const supabase = createClient(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-var globalCounter = 0;
-
 // In dev, your React app runs on http://localhost:3000
 // This allows direct cross-origin calls if you choose to do them.
 // (If you use Vite proxy, CORS won't even be necessary, but it's harmless.)
@@ -54,6 +53,22 @@ app.use(
     origin: ["http://localhost:3000"],
   })
 );
+
+app.get("/api/images", async (_req, res) => {
+  const upstream = await fetch((process?.env?.CDN_BASE_URL ?? "") + _req.query.image);
+  if (!upstream.ok) {
+    res.status(502).send("Upstream error");
+  }
+
+  res.set({
+      "Content-Type": upstream.headers.get("Content-Type") ?? "image/png",
+      // browser + CDN caching for *your* endpoint:
+      "Cache-Control": "public, max-age=31536000, immutable",
+    }
+  );
+
+  Readable.fromWeb(upstream.body as any).pipe(res);
+})
 
 app.get("/api/ingredients", async (_req, res) => {
   let query = supabase.from("IngredientList").select("*").gt("hits", 5);
@@ -66,30 +81,19 @@ app.get("/api/ingredients", async (_req, res) => {
 app.get("/api/recipes", async (_req, res) => {
   let query = supabase.from("Recipes").select("*");
   if (_req.query.filterValue !== "undefined" && _req.query.filterValue !== "") query.ilike("name", `%${_req.query.filterValue}%`)
-  if (_req.query.howToPrep !== "") query.eq("how_to_prep", _req.query.howToPrep)
-  if (_req.query.mealType !== "") query.eq("meal_type", _req.query.mealType)
-  if (_req.query.difficulty !== "") query.eq("difficulty", _req.query.difficulty)
-  const { data } = await query
-  res.json(data?.map((el) => {
-    el.image = process.env.CDN_BASE_URL + el.image;
-    // el.difficulty = Object.keys(Difficulty)[Object.values(Difficulty).indexOf(el.difficulty)];
-    // el.meal_type = Object.keys(MealType)[Object.values(MealType).indexOf(el.meal_type)];
-    // el.how_to_prep = Object.keys(HowToPrep)[Object.values(HowToPrep).indexOf(el.how_to_prep)];
-    return el;
-  }));
+  if (_req.query.howToPrep !== "undefined" && _req.query.howToPrep !== "") query.eq("how_to_prep", _req.query.howToPrep)
+  if (_req.query.mealType !== "undefined" && _req.query.mealType !== "") query.eq("meal_type", _req.query.mealType)
+  if (_req.query.difficulty !== "undefined" && _req.query.difficulty !== "") query.eq("difficulty", _req.query.difficulty)
+  const { data } = await query;
+  res.json(data);
 });
 
 app.get("/api/recipes/:id", async (_req, res) => {
-  console.log(_req.params.id);
   let query = supabase.from("Recipes").select("*, Ingredients (id, description, name), Steps (id, title, body, step, image_link)").eq("id", _req.params.id);
   const { data } = await query
   if (data != null) res.json({ ...data[0],
-    image: process.env.CDN_BASE_URL + data[0].image,
     steps: data[0].Steps,
     ingredients: data[0].Ingredients
-    // difficulty: Object.keys(Difficulty)[Object.values(Difficulty).indexOf(data[0].difficulty)],
-    // meal_type: Object.keys(MealType)[Object.values(MealType).indexOf(data[0].meal_type)],
-    // how_to_prep: Object.keys(HowToPrep)[Object.values(HowToPrep).indexOf(data[0].how_to_prep)]
   });
   else{
       res.status(404).send("recipe does not exist");
@@ -144,8 +148,6 @@ app.put("/api/recipes/:id", async (_req, res) => {
   } ).eq("id", _req.params.id)
   .select('id')
   .single();
-
-  console.log(data);
 
   await supabase
     .from('Ingredients')

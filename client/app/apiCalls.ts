@@ -72,6 +72,15 @@ export type RecipeDetailsResponse = {
     hits: number
   }
 
+export async function getImage(image: string): Promise<RecipeResponse[]> {
+    const res = await fetch(`/api/recipes?image=${image}`);
+    if (!res.ok) {
+      if (res.status == 429) throw new Error("Too many requests");
+      throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+    }
+    return res.json();
+  }
+
 export async function getRecipes(filterData: FilterData | undefined): Promise<RecipeResponse[]> {
     const res = await fetch(`/api/recipes?filterValue=${filterData?.filterValue}&difficulty=${filterData?.difficulty}&howToPrep=${filterData?.howToPrep}&mealType=${filterData?.mealType}`);
     if (!res.ok) {

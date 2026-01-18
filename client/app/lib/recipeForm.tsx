@@ -143,7 +143,6 @@ export default function RecipeForm(props: RecipeFormProps) {
             };
           }) ?? [],
       };
-      console.log(recipe);
       recipeSchema.parse(recipe);
 
       props.createNewRecipe(recipe);
@@ -160,11 +159,17 @@ export default function RecipeForm(props: RecipeFormProps) {
           Osnovno
           <label style={{ top: "20px", position: "absolute" }}>
             Naziv recepta
-            <input {...register("name")} type="text" name="name"></input>
+            <input
+              style={{ backgroundColor: "#EEE" }}
+              {...register("name")}
+              type="text"
+              name="name"
+            ></input>
           </label>
           <label style={{ top: "100px", position: "absolute" }}>
             Uvod
             <input
+              style={{ backgroundColor: "#EEE" }}
               {...register("description")}
               width="90%"
               type="text"
@@ -182,42 +187,59 @@ export default function RecipeForm(props: RecipeFormProps) {
               -
             </Button>
           ) : undefined}
-          {[...Array(numberOfIngredients)].map((v, index) => {
-            return (
-              <div
-                style={{ top: `${70 + 120 * index}px`, position: "absolute" }}
-                key={index}
-              >
-                <label>
-                  Opis{" "}
-                  <input
-                    {...register(`ingredients.${index}.description` as const)}
-                    type="text"
-                    name={`ingredients.${index}.description`}
-                  ></input>
-                </label>
-                <label>
-                  Naziv{" "}
-                  <Controller
-                    control={control}
-                    render={({ field }) => (
-                      <CreatableSelect
-                        defaultValue={{
-                          value: field.value?.toString(),
-                          label: field.value?.toString(),
-                        }}
-                        onChange={(val) => field.onChange(val?.value)}
-                        options={ingredients.map((ing) => {
-                          return { value: ing.name, label: ing.name };
-                        })}
-                      ></CreatableSelect>
-                    )}
-                    name={`ingredients.${index}.name`}
-                  />
-                </label>
-              </div>
-            );
-          })}
+          <table width={"60%"}>
+            {[...Array(numberOfIngredients)].map((v, index) => {
+              return (
+                // <div
+                //   style={{ top: `${70 + 120 * index}px`, position: "absolute" }}
+                //   key={index}
+                // >
+                <tr>
+                  <td style={{ width: "40px" }}>
+                    <label>
+                      Opis{" "}
+                      <input
+                        style={{ backgroundColor: "#EEE" }}
+                        {...register(
+                          `ingredients.${index}.description` as const,
+                        )}
+                        type="text"
+                        name={`ingredients.${index}.description`}
+                      ></input>
+                    </label>
+                  </td>
+                  <td
+                    style={{
+                      width: "200px",
+                      left: "240px",
+                    }}
+                  >
+                    <label>
+                      Sastojak{" "}
+                      <Controller
+                        control={control}
+                        render={({ field }) => (
+                          <CreatableSelect
+                            defaultValue={{
+                              value: field.value?.toString(),
+                              label: field.value?.toString(),
+                            }}
+                            onChange={(val) => field.onChange(val?.value)}
+                            options={ingredients.map((ing) => {
+                              return { value: ing.name, label: ing.name };
+                            })}
+                          ></CreatableSelect>
+                        )}
+                        name={`ingredients.${index}.name`}
+                      />
+                    </label>
+                  </td>
+                </tr>
+
+                // </div>
+              );
+            })}
+          </table>
           <Button
             style={{
               top: `${70 + 120 * numberOfIngredients}px`,
@@ -258,6 +280,7 @@ export default function RecipeForm(props: RecipeFormProps) {
                 <label>
                   Opis{" "}
                   <input
+                    style={{ backgroundColor: "#EEE" }}
                     {...register(`steps.${index}.body` as const)}
                     type="text"
                     name={`steps.${index}.body`}
@@ -283,6 +306,7 @@ export default function RecipeForm(props: RecipeFormProps) {
             <label>
               (u minutama)
               <input
+                style={{ backgroundColor: "#EEE" }}
                 {...register(`time_to_prep`, { valueAsNumber: true })}
                 type="number"
                 name={`time_to_prep`}
@@ -295,6 +319,7 @@ export default function RecipeForm(props: RecipeFormProps) {
             {" "}
             Broj porcija:
             <input
+              style={{ backgroundColor: "#EEE" }}
               {...register(`portions`, { valueAsNumber: true })}
               type="number"
               name={`portions`}
