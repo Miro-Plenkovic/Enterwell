@@ -105,7 +105,7 @@ app.post("/api/recipes", async (_req, res) => {
   .from('Recipes')
   .insert({ 
     name: _req.body.name,
-    image: "/Icons/" + "Frog" + ".png",
+    image: "/Images/" + _req.body.image + ".png",
     time_to_prep: _req.body.time_to_prep,
     portions: _req.body.portions,
     difficulty: _req.body.difficulty,
@@ -138,7 +138,7 @@ app.put("/api/recipes/:id", async (_req, res) => {
   .from('Recipes')
   .update({ 
     name: _req.body.name,
-    image: "/Icons/" + "Frog" + ".png",
+    image: "/Images/" + _req.body.image + ".png",
     time_to_prep: _req.body.time_to_prep,
     portions: _req.body.portions,
     difficulty: _req.body.difficulty,
@@ -148,14 +148,16 @@ app.put("/api/recipes/:id", async (_req, res) => {
   } ).eq("id", _req.params.id)
   .select('id')
   .single();
-
-  await supabase
+  
+  _req.body.ingredients.forEach(async (ing: any) => 
+    await supabase
     .from('Ingredients')
-    .update(_req.body.ingredients.map((ing: any) => {return {recipeID: data?.id, description: ing.description, name: ing.name}}));
+    .update({recipeID: data?.id, description: ing.description, name: ing.name}).eq("id", ing.id));
 
-  await supabase
+  _req.body.steps.forEach(async (st: any) => 
+    await supabase
     .from('Steps')
-    .update(_req.body.steps.map((st: any) => {return {recipeID: data?.id, body: st.body, step: st.step}}));
+    .update({recipeID: data?.id, body: st.body, step: st.step}).eq("id", st.id));
 
   res.json(data?.id ?? 1);
 });

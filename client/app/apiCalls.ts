@@ -22,6 +22,7 @@ export type Steps = {
 }
 
 export type StepsRequest = {
+  id: number,
   body: string,
   step: number
 }
@@ -33,6 +34,7 @@ export type Ingredients = {
 }
 
 export type IngredientsRequest = {
+  id: number,
   description: string,
   name: string
 }

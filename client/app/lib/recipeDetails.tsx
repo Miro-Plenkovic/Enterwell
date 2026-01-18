@@ -89,7 +89,7 @@ export default function RecipeDetails(props: RecipeDetailsProps) {
           Broj porcija: <label>{props.recipe.portions}</label>
         </label>
       </div>
-      <div style={{ top: "230px", left: "400px", position: "absolute" }}>
+      <div style={{ top: "230px", left: "800px", position: "absolute" }}>
         <label>
           <Image
             className="dark:invert"

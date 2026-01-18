@@ -59,7 +59,6 @@ const imageOptions = [
   { value: "Tomato", label: "Rajčica" },
   { value: "Onion", label: "Luk" },
   { value: "Flour", label: "Brašno" },
-  { value: "Frog", label: "Frog" },
 ];
 
 const recipeSchema = zod.object({
@@ -133,11 +132,12 @@ export default function RecipeForm(props: RecipeFormProps) {
         difficulty: data.difficulty ?? 0,
         steps:
           data?.steps?.map((step, index) => {
-            return { body: step.body, step: index + 1 };
+            return { id: step.id, body: step.body, step: index + 1 };
           }) ?? [],
         ingredients:
           data?.ingredients?.map((ing) => {
             return {
+              id: ing.id,
               description: ing.description,
               name: ing.name,
             };
@@ -195,7 +195,7 @@ export default function RecipeForm(props: RecipeFormProps) {
                 //   key={index}
                 // >
                 <tr>
-                  <td style={{ width: "40px" }}>
+                  <td style={{ width: "40px", position: "absolute" }}>
                     <label>
                       Opis{" "}
                       <input
@@ -206,12 +206,19 @@ export default function RecipeForm(props: RecipeFormProps) {
                         type="text"
                         name={`ingredients.${index}.description`}
                       ></input>
+                      <input
+                        hidden
+                        {...register(`ingredients.${index}.id` as const)}
+                        type="text"
+                        name={`ingredients.${index}.id`}
+                      ></input>
                     </label>
                   </td>
                   <td
                     style={{
                       width: "200px",
                       left: "240px",
+                      position: "absolute",
                     }}
                   >
                     <label>
@@ -285,6 +292,12 @@ export default function RecipeForm(props: RecipeFormProps) {
                     type="text"
                     name={`steps.${index}.body`}
                   ></input>
+                  <input
+                    hidden
+                    {...register(`steps.${index}.body` as const)}
+                    type="text"
+                    name={`steps.${index}.id`}
+                  ></input>
                 </label>
               </div>
             );
@@ -335,6 +348,7 @@ export default function RecipeForm(props: RecipeFormProps) {
               render={({ field }) => (
                 <Select
                   options={imageOptions}
+                  onChange={(val) => field.onChange(val?.value)}
                   defaultValue={imageOptions.find((img) =>
                     field?.value?.includes(img.value),
                   )}
@@ -357,6 +371,9 @@ export default function RecipeForm(props: RecipeFormProps) {
                     { value: "1", label: "Srednje zahtjevno" },
                     { value: "2", label: "Složeno" },
                   ]}
+                  onChange={(val) =>
+                    field.onChange(parseInt(val?.value ?? "0"))
+                  }
                   defaultValue={{
                     value: field.value?.toString(),
                     label: Difficulty[field?.value ?? 0],
@@ -379,6 +396,9 @@ export default function RecipeForm(props: RecipeFormProps) {
                     value: field.value?.toString(),
                     label: MealType[field?.value ?? 0],
                   }}
+                  onChange={(val) =>
+                    field.onChange(parseInt(val?.value ?? "0"))
+                  }
                   options={[
                     { value: "0", label: "Hladno predjelo" },
                     { value: "1", label: "Toplo predjelo" },
@@ -410,6 +430,9 @@ export default function RecipeForm(props: RecipeFormProps) {
                     value: field.value?.toString(),
                     label: HowToPrep[field?.value ?? 0],
                   }}
+                  onChange={(val) =>
+                    field.onChange(parseInt(val?.value ?? "0"))
+                  }
                   options={[
                     { value: "0", label: "Bez termičke obrade" },
                     { value: "1", label: "Blanširanje" },
